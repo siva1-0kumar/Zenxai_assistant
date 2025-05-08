@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenxai Prompt - Powered by OpenAI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    h2 {
+      color: #333;
+    }
+    #promptForm {
+      margin-bottom: 20px;
+    }
+    #responseBox {
+      padding: 10px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      min-height: 50px;
+    }
+    #loading {
+      display: none;
+      font-weight: bold;
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ask a Question (OpenAI)</h2>
+  <form id="promptForm">
+    <input type="text" id="promptInput" placeholder="Enter your question..." required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <h3>Response:</h3>
+  <div id="responseBox"></div>
+  <div id="loading">Loading...</div>
+
+  <script>
+    const form = document.getElementById('promptForm');
+    const input = document.getElementById('promptInput');
+    const responseBox = document.getElementById('responseBox');
+    const loading = document.getElementById('loading');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Show loading indicator
+      loading.style.display = 'block';
+      responseBox.innerText = '';  // Clear any previous response
+
+      const prompt = input.value;
+
+      try {
+        const response = await fetch('http://localhost:3000/ask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        
+        // Hide loading indicator
+        loading.style.display = 'none';
+
+        // Display result or error
+        if (data.result) {
+          responseBox.innerText = data.result;
+        } else if (data.error) {
+          responseBox.innerText = `Error: ${data.error}`;
+        } else {
+          responseBox.innerText = 'Error: Unexpected response format.';
+        }
+      } catch (error) {
+        loading.style.display = 'none'; 
+        responseBox.innerText = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
